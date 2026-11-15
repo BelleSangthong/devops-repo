@@ -43,8 +43,11 @@ export function createApp(store, { log = console.log } = {}) {
     next()
   })
 
-  app.get('/', (request, response) => {
-    response.json({ app: 'Waypoint', status: 'running' })
+  app.get('/health', (request, response) => {
+    if (process.env.WEBSITE_SITE_NAME) {
+      return response.status(503).json({ status: 'broken on purpose' })
+    }
+    response.json({ status: 'healthy', version: '1.0.0', ...(COMMIT && { commit: COMMIT }) })
   })
 
   // Used by App Service (module 04), by scripts/health-check.sh (modules 04 and 05) and
